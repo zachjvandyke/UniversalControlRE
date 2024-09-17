@@ -1,6 +1,6 @@
 # async_packet.py
 import struct
-from typing import Optional, Union
+from typing import Optional
 import asyncio
 from packet import UcPacket, parse_packet_contents, ser
 

@@ -1,6 +1,6 @@
 # packet.py
 from dataclasses import dataclass
-from typing import Optional, List, Union
+from typing import Optional, List
 import struct
 import io
 
@@ -40,30 +40,10 @@ class PV(UcPacket):
 
 
 @dataclass
-class FR(UcPacket):
-    ap: AddressPair
-    some_number: int  # Corresponds to u16
-    buf: str
-
-
-@dataclass
 class ZM(UcPacket):
     ap: AddressPair
     unknown: int  # Corresponds to u32
     compressed_payload: bytes
-
-
-@dataclass
-class PS(UcPacket):
-    ap: AddressPair
-    buf: bytes
-
-
-@dataclass
-class PL(UcPacket):
-    ap: AddressPair
-    name: str
-    names: List[str]
 
 
 def ser(packet: UcPacket) -> bytes:
@@ -118,17 +98,6 @@ def write_packet(p: UcPacket, w: io.BytesIO):
         w.write(b'\x00\x00\x00')  # Padding with 3 zeros
         w.write(struct.pack('<f', val))
 
-    elif isinstance(p, FR):
-        ap = p.ap
-        some_number = p.some_number
-        buf = p.buf
-        size = len(buf) + 8
-        w.write(struct.pack('<H', size))
-        w.write(b'FR')
-        write_address_pair(ap, w)
-        w.write(struct.pack('<H', some_number))
-        w.write(buf.encode('utf-8'))
-
     elif isinstance(p, ZM):
         ap = p.ap
         unknown = p.unknown
@@ -140,34 +109,11 @@ def write_packet(p: UcPacket, w: io.BytesIO):
         w.write(struct.pack('<I', unknown))
         w.write(compressed_payload)
 
-    elif isinstance(p, PS):
-        ap = p.ap
-        buf = p.buf
-        size = len(buf) + 6
-        w.write(struct.pack('<H', size))
-        w.write(b'PS')
-        write_address_pair(ap, w)
-        w.write(buf)
-
-    elif isinstance(p, PL):
-        ap = p.ap
-        name = p.name
-        names = p.names
-        size_of_names = sum(len(n) for n in names) + len(names)  # Names and newlines
-        size = 6 + len(name) + 7 + size_of_names
-        w.write(struct.pack('<H', size))
-        w.write(b'PL')
-        write_address_pair(ap, w)
-        w.write(name.encode('utf-8'))
-        w.write(b'\x00\x00\x00\x00\x00\x00\x00')  # Padding with 7 zeros
-        for n in names:
-            w.write(n.encode('utf-8'))
-            w.write(b'\n')
     else:
         raise ValueError(f"Unknown UcPacket type: {type(p)}")
 
 
-def parse_packet_contents(bytes_: bytes) -> UcPacket:
+def parse_packet_contents(bytes_: bytes) -> Optional[UcPacket]:
     if len(bytes_) < 6:
         raise ValueError("Packet contents too small")
 

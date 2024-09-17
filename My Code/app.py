@@ -1,6 +1,7 @@
 # app.py
 import asyncio
 from async_driver import AsyncUcDriver
+from uc_api import UcAPI
 
 
 async def main():
@@ -11,28 +12,31 @@ async def main():
     print("Connected to the server!")
     await driver.subscribe()
 
+    # Create an instance of UcAPI
+    uc_api = UcAPI(driver)
+
     # Start the response reading task
     response_task = asyncio.create_task(driver.read_responses())
     try:
         # Initially set mixerBypass to False
-        await driver.set_mixer_bypass(False)
+        await uc_api.set_mixer_bypass(False)
         print("mixerBypass set to False")
 
         # Wait for a short period
         await asyncio.sleep(2)
 
         # Toggle mixerBypass to True
-        await driver.set_mixer_bypass(True)
+        await uc_api.set_mixer_bypass(True)
         print("mixerBypass set to True")
 
         # Wait for a short period
         await asyncio.sleep(2)
 
         # Toggle mixerBypass back to False
-        await driver.set_mixer_bypass(False)
+        await uc_api.set_mixer_bypass(False)
         print("mixerBypass set to False")
 
-    # Keep the program running to continue receiving responses
+        # Keep the program running to continue receiving responses
         await asyncio.Event().wait()
     except KeyboardInterrupt:
         print("Shutting down...")

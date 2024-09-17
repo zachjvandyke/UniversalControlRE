@@ -5,7 +5,7 @@ import struct
 import json
 import zlib
 from typing import Optional
-from packet import UcPacket, AddressPair, ser, JM, UM, KA, PV, ZM, read_udp_packet
+from packet import UcPacket, AddressPair, JM, UM, KA, ZM, read_udp_packet
 from async_packet import PacketCodec
 
 
@@ -87,30 +87,6 @@ class AsyncUcDriver:
             s=json.dumps(sub_msg_uc)
         ))
 
-    async def set_mixer_bypass(self, bypass: bool):
-        """
-        Set the mixerBypass parameter to True or False.
-        """
-        await self.send(PV(
-            ap=AddressPair(a=0x68, b=0x6a),
-            name="global/mixerBypass",
-            val=1.0 if bypass else 0.0
-        ))
-
-    async def mute_channel(self, channel_number: int, mute: bool):
-        await self.send(PV(
-            ap=AddressPair(a=0x68, b=0x6a),
-            name=f"line/ch{channel_number}/mute",
-            val=1.0 if mute else 0.0
-        ))
-
-    async def set_channel_volume(self, channel_number: int, volume: float):
-        await self.send(PV(
-            ap=AddressPair(a=0x68, b=0x6a),
-            name=f"line/ch{channel_number}/volume",
-            val=volume
-        ))
-
     async def read_responses(self):
         try:
             while True:
@@ -162,7 +138,6 @@ def decode_zm_packet_data(data: bytes) -> str:
     Skips the first two bytes and decompresses the rest.
     """
     try:
-        # Skip the first two bytes (as per your existing logic)
         compressed_data = data[2:]
         # Create a decompressor object for raw DEFLATE data
         decompressor = zlib.decompressobj(wbits=-15)
@@ -187,7 +162,6 @@ class UdpProtocol(asyncio.DatagramProtocol):
             stream = io.BytesIO(data)
             packet: Optional[UcPacket] = read_udp_packet(stream)
             if packet is not None:
-                packet = packet  # Type hint for the type checker
                 print_packet(packet, outgoing=False)
             else:
                 # MS packet received; skip printing
@@ -200,5 +174,3 @@ class UdpProtocol(asyncio.DatagramProtocol):
 
     def connection_lost(self, exc):
         print("UDP connection closed")
-
-
