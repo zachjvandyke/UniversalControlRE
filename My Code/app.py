@@ -36,6 +36,9 @@ async def main():
         await uc_api.set_mixer_bypass(False)
         print("mixerBypass set to False")
 
+        await uc_api.set_channel_mute(1, True)
+        print("set ch1 to mute")
+
         # Keep the program running to continue receiving responses
         await asyncio.Event().wait()
     except KeyboardInterrupt:
