@@ -1,6 +1,6 @@
 # UC Control Python Package
 
-This package provides a Python-based interface for controlling a Universal Control (UC) device. It allows you to connect to the UC device over TCP/IP, subscribe to its services, and modify mixer settings such as muting channels and toggling the mixer bypass.
+This package provides a Python-based interface for controlling Presonus' Universal Control (UC) software, specifically designed for the new Quantum HD 8. It allows you to connect to the UC device over TCP/IP, subscribe to its services, and modify mixer settings such as muting channels and toggling the mixer bypass.
 
 ## Table of Contents
 
@@ -29,7 +29,6 @@ This package provides a Python-based interface for controlling a Universal Contr
 - An accessible Universal Control device on the network
 - Required Python packages:
   - `asyncio`
-  - `struct`
   - `dataclasses` (for Python 3.7, built-in for 3.7+)
   - `typing`
   - `zlib`
@@ -40,8 +39,8 @@ This package provides a Python-based interface for controlling a Universal Contr
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/uc-control-python.git
-   cd uc-control-python
+   git clone https://github.com/zachjvandyke/UniversalControlRE.git
+   cd UniversalControlRE
    ```
 
 2. **Install Dependencies**
@@ -68,7 +67,7 @@ This package provides a Python-based interface for controlling a Universal Contr
 Update the `ip_address` variable in `app.py` with the IP address of your UC device:
 
 ```python
-ip_address = '10.38.111.25'  # Replace with your device's IP address
+ip_address = '10.0.0.1'  # Replace with your device's IP address
 ```
 
 Run the `app.py` script:
